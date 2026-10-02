@@ -83,10 +83,23 @@ open_shared_memory (void)
 
           sprintf (name, "/gdk-wayland-%x", g_random_int ());
 
-          ret = shm_open (name, O_CREAT | O_EXCL | O_RDWR | O_CLOEXEC, 0600);
+          int flags = O_CREAT | O_EXCL | O_RDWR;
+#if defined (O_CLOEXEC) && !defined (__APPLE__)
+          flags |= O_CLOEXEC;
+#endif
+          ret = shm_open (name, flags, 0600);
 
           if (ret >= 0)
-            shm_unlink (name);
+            {
+#if defined (__APPLE__)
+              if (fcntl (ret, F_SETFD, FD_CLOEXEC) < 0)
+                {
+                  close (ret);
+                  ret = -1;
+                }
+#endif
+              shm_unlink (name);
+            }
           else if (errno == EEXIST)
             continue;
 #endif

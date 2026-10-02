@@ -22,7 +22,7 @@
 #include "gtkcolorpickershellprivate.h"
 #include "gtkcolorpickerkwinprivate.h"
 
-#ifdef __APPLE__
+#ifdef GDK_WINDOWING_MACOS
 #include "gtkcolorpickerquartzprivate.h"
 #endif
 
@@ -62,14 +62,14 @@ gtk_color_picker_new (void)
 {
   GtkColorPicker *picker = NULL;
 
-#if defined (G_OS_UNIX) && !defined(__APPLE__)
+#if defined (G_OS_UNIX) && !defined(GDK_WINDOWING_MACOS)
   if (!picker)
     picker = gtk_color_picker_portal_new ();
   if (!picker)
     picker = gtk_color_picker_shell_new ();
   if (!picker)
     picker = gtk_color_picker_kwin_new ();
-#elif defined (__APPLE__)
+#elif defined (GDK_WINDOWING_MACOS)
   if (!picker)
     picker = gtk_color_picker_quartz_new ();
 #elif defined (G_OS_WIN32)

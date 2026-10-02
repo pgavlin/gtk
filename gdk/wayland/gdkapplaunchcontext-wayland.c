@@ -23,7 +23,9 @@
 #include <unistd.h>
 
 #include <glib.h>
+#ifndef __APPLE__
 #include <gio/gdesktopappinfo.h>
+#endif
 
 #include "gdkwayland.h"
 #include "gdkdisplay-wayland.h"
@@ -73,13 +75,16 @@ find_app_id (GAppInfo *info)
 {
   const char *id;
 
-  /* For Flatpak, it's directly written in the desktop file */
+  /* For Flatpak, it's directly written in the desktop file. The desktop
+   * app-info implementation is not provided by GLib on macOS. */
+#ifndef __APPLE__
   if (G_IS_DESKTOP_APP_INFO (info))
     {
       id = g_desktop_app_info_get_string (G_DESKTOP_APP_INFO (info), "X-Flatpak");
       if (id)
         return (char *) id;
     }
+#endif
 
   /* We could look at g_desktop_app_info_get_startup_wm_class here.
    * However it appears that generally the desktop ID is more likely

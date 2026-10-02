@@ -156,8 +156,13 @@ endif
 os_unix = not os_win32
 
 if os_darwin
-  wayland_enabled = false
+  # The Wayland protocol and client library are Unix-portable when built
+  # against epoll-shim. Keep X11 disabled, but allow an explicitly enabled
+  # Wayland backend for native compositor testing.
   x11_enabled = false
+  if wayland_enabled
+    add_project_arguments('-DWL_EGL_PLATFORM', language: 'c')
+  endif
 else
   macos_enabled = false
 endif
